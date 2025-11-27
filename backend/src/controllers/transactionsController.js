@@ -1,4 +1,6 @@
 import { fetchTransactionsForUser } from "../services/transactionService.js";
+import { sql } from "../config/db.js";
+import { upsertTransactions, deleteTransaction as deleteVector } from "../services/vectorStoreService.js";
 
 export async function getTransactionsByUserId(req, res) {
   try {
@@ -27,6 +29,14 @@ export async function createTransaction(req, res) {
       RETURNING *
     `;
 
+    // Sync to Pinecone
+    // We wrap in try-catch so vector DB failure doesn't break the main flow
+    try {
+      await upsertTransactions(transaction);
+    } catch (err) {
+      console.error("Failed to sync new transaction to Pinecone:", err);
+    }
+
     console.log(transaction);
     res.status(201).json(transaction[0]);
   } catch (error) {
@@ -49,6 +59,13 @@ export async function deleteTransaction(req, res) {
 
     if (result.length === 0) {
       return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    // Sync deletion to Pinecone
+    try {
+      await deleteVector(id);
+    } catch (err) {
+      console.error("Failed to delete transaction from Pinecone:", err);
     }
 
     res.status(200).json({ message: "Transaction deleted successfully" });

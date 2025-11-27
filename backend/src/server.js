@@ -6,6 +6,8 @@ import transactionsRoute from "./routes/transactionsRoute.js";
 import job from "./config/cron.js";
 import ocrRoutes from "./routes/ocrRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import insightsRoutes from "./routes/insightsRoutes.js";
+import syncRoutes from "./routes/syncRoutes.js";
 
 dotenv.config();
 
@@ -32,6 +34,10 @@ app.get("/api/health", (req, res) => {
 app.use("/api/ocr/", ocrRoutes);
 
 app.use("/api/ai", aiRoutes);
+
+app.use("/api/insights", insightsRoutes);
+
+app.use("/api/sync", syncRoutes);
 
 app.use("/api/transactions", transactionsRoute);
 

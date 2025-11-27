@@ -12,7 +12,17 @@ export const SignOutButton = () => {
   const handleSignOut = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", style: "destructive", onPress: signOut },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut();
+          } catch (err) {
+            console.error("Sign out error:", err);
+          }
+        },
+      },
     ]);
   };
 

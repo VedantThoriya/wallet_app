@@ -1,0 +1,15 @@
+# Ignore android and ios folders if they exist
+android/
+ios/
+
+# Ignore node_modules (EAS will install fresh)
+node_modules/
+
+# Ignore build artifacts
+*.log
+.expo/
+.expo-shared/
+
+# Ignore local env files
+.env.local
+.env.*.local

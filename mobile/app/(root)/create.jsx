@@ -67,24 +67,32 @@ const CreateScreen = () => {
         ? -Math.abs(parseFloat(amount))
         : Math.abs(parseFloat(amount));
 
+      const requestBody = {
+        user_id: user.id,
+        title,
+        amount: formattedAmount,
+        category: selectedCategory,
+      };
+
+      console.log("Creating transaction with data:", requestBody);
+
       const response = await fetch(`${API_URL}/transactions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          user_id: user.id,
-          title,
-          amount: formattedAmount,
-          category: selectedCategory,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.log(errorData);
+        console.log("Transaction creation failed:");
+        console.log("Status:", response.status);
+        console.log("Error data:", errorData);
         throw new Error(errorData.error || "Failed to create transaction");
       }
+      
+      console.log("Transaction created successfully");
 
       router.back();
     } catch (error) {

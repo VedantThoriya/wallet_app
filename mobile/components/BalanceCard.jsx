@@ -7,14 +7,14 @@ export const BalanceCard = ({ summary }) => {
     <View style={styles.balanceCard}>
       <Text style={styles.balanceTitle}>Total Balance</Text>
       <Text style={styles.balanceAmount}>
-        ${parseFloat(summary.balance).toFixed(2)}
+        ₹{parseFloat(summary?.balance ?? 0).toFixed(2)}
       </Text>
       <View style={styles.balanceStats}>
         <View style={styles.balanceStatItem}>
           {/* Income */}
           <Text style={styles.balanceStatLabel}>Income</Text>
           <Text style={[styles.balanceStatAmount, { color: COLORS.income }]}>
-            +${parseFloat(summary.income).toFixed(2)}
+            +₹{parseFloat(summary?.income ?? 0).toFixed(2)}
           </Text>
         </View>
 
@@ -25,7 +25,7 @@ export const BalanceCard = ({ summary }) => {
           {/* Expenses */}
           <Text style={styles.balanceStatLabel}>Expenses</Text>
           <Text style={[styles.balanceStatAmount, { color: COLORS.expense }]}>
-            -${Math.abs(parseFloat(summary.expenses)).toFixed(2)}
+            -₹{Math.abs(parseFloat(summary?.expenses ?? 0)).toFixed(2)}
           </Text>
         </View>
       </View>

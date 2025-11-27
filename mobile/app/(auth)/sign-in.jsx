@@ -1,7 +1,7 @@
-import { useSignIn } from "@clerk/clerk-expo";
+import { useSignIn, useAuth } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { Text, TextInput, TouchableOpacity, View, Image } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { styles } from "../../assets/styles/auth.styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,7 +9,19 @@ import { COLORS } from "../../constants/colors";
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
+  const { signOut } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    const doSignOut = async () => {
+      try {
+        await signOut();
+      } catch (err) {
+        console.log("Error signing out on mount:", err);
+      }
+    };
+    doSignOut();
+  }, []);
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -19,27 +31,46 @@ export default function Page() {
   const onSignInPress = async () => {
     if (!isLoaded) return;
 
-    // Start the sign-in process using the email and password provided
     try {
+      const cleanEmail = emailAddress.trim();
+      const cleanPassword = password.trim();
+      
+      console.log("Attempting sign-in with:", cleanEmail);
+      console.log("Attempting sign-in with:", cleanPassword);
+      
       const signInAttempt = await signIn.create({
-        identifier: emailAddress,
-        password,
+        identifier: cleanEmail,
+        password: cleanPassword,
       });
-      console.log("Sign-in attempt:", JSON.stringify(signInAttempt, null, 2));
 
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
         router.replace("/");
+      } else if (signInAttempt.status === "needs_second_factor") {
+        console.error("Sign-in status: needs_second_factor");
+        console.log("Supported 2nd Factors:", JSON.stringify(signInAttempt.supportedSecondFactors, null, 2));
+        setError("Clerk requires 2FA. Check logs for supported factors.");
       } else {
-        // If the status isn't complete, check why. User might need to
-        // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2));
+        console.error("Sign-in status not complete:", signInAttempt.status);
+        setError(`Sign-in incomplete. Status: ${signInAttempt.status}`);
       }
     } catch (err) {
+      console.error("Sign-in error object:", err);
+      if (err.message) {
+        console.error("Sign-in error message:", err.message);
+      }
+      console.error("Sign-in error stringified:", JSON.stringify(err, null, 2));
+      const errorString = JSON.stringify(err);
+      
       if (err.errors?.[0]?.code === "form_password_incorrect") {
         setError("Password is incorrect. Please try again.");
+      } else if (err.errors?.[0]?.code === "form_identifier_not_found") {
+        setError("Email not found. Please sign up.");
+      } else if (err.errors?.[0]?.code === "form_param_format_invalid") {
+        setError("Invalid email format.");
+      } else if (errorString.includes("session_exists")) {
+        console.log("Session exists detected, redirecting...");
+        router.replace("/");
       } else {
         setError("An error occurred. Please try again.");
       }

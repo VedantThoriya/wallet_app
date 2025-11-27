@@ -39,7 +39,7 @@ export default function SignUpScreen() {
       if (err.errors?.[0]?.code === "form_identifier_exists") {
         setError("That email address is already in use. Please try another.");
       } else {
-        setError("An error occurred. Please try again.");
+        setError(err.errors?.[0]?.message);
       }
       console.log(err);
     }

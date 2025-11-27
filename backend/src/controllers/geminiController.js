@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { bufferToGeminiImage } from "../utils/bufferToGeminiImage.js";
+import { classifyTransaction } from "../services/classifierService.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -15,7 +16,7 @@ Return ONLY this JSON object and nothing else:
 {
   "name": string,
   "total": number,
-  "category": "food" | "shopping" | "transportation" | "entertainment" | "bills" | "income" | "other"
+  "category": "food" | "shopping" | "transportation" | "entertainment" | "bills" | "other"
 }
 
 Example: 
@@ -65,6 +66,12 @@ Output rules:
         }
 
         const parsed = JSON.parse(text);
+
+        // Fallback classification if Gemini is unsure
+        if (!parsed.category || parsed.category.toLowerCase() === "other") {
+            const predictedCategory = await classifyTransaction(parsed.name);
+            parsed.category = predictedCategory.toLowerCase();
+        }
 
         return {
             success: true,

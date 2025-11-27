@@ -22,6 +22,8 @@ This isn't just a front-end app — it's a **complete mobile application** with 
 - 🔄 **Pull to refresh** functionality from scratch
 - 🗑️ **Delete transactions** to update balance
 - 🚪 **Logout** to navigate back to login screen
+- 📊 **Monthly/Weekly Insights** to track spending habits
+- 🤖 **AI Chat** for expense management and queries
 
 ---
 
@@ -57,6 +59,12 @@ REDIS_URL=<your_redis_connection_url>
 
 ```bash
 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=<your_clerk_key>
+HUGGINGFACE_API_KEY=<your_huggingface_key>
+GEMINI_API_KEY=<your_gemini_key>
+UPSTASH_REDIS_REST_URL=<your_redis_url>
+UPSTASH_REDIS_REST_TOKEN=<your_redis_token>
+PINECONE_API_KEY=<your_pinecone_key>
+PINECONE_INDEX_NAME=<your_pinecone_index>
 ```
 
 ## ⚙️ Run the backend
